@@ -7,7 +7,7 @@ resource "tls_self_signed_cert" "certificate" {
   private_key_pem = tls_private_key.private_key.private_key_pem
 
   subject {
-    common_name  = "snakesinacloud-starkindustry.com"
+    common_name  = "snakesinacloud-${terraform.workspace}-starkindustry.com"
     organization = "Stark Industry Dev"
   }
 
