@@ -1,0 +1,50 @@
+name: Verify Terraform change and deploy to staging
+
+on:
+    pull_request:
+        branches: [ main ]
+        paths:
+            - "**/*.tf"
+            - "**/*.tfvars"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v3
+        - uses: hashicorp/setup-terraform@v2
+
+        - name: Run a fmt check on the Terraform code
+          id: fmt
+          run: terraform fmt -check
+
+        - name: Select staging workspace
+          id: workspace
+          run: terraform workspace select staging
+
+        - name: Validate Terraform
+          id: validate
+          run: terraform validate
+
+        - name: Terraform init
+          id: init
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform init
+
+        - name: Execute planning
+          id: plan
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+          run: terraform plan -var-file=staging.tfvars
+
+        - name: Deploy infrastructure to staging environment
+          id: apply
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform apply -auto-approve -var-file=staging.tfvars
