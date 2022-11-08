@@ -55,6 +55,8 @@ email address as you choose in order to tailor your alert notifications.
 
 ## Workflows
 This app is automatically deployed using a GitHub Actions CI/CD pipeline. There are two main workflows, described below.
+Any modification of the .tf or .tfvars file will trigger the workflows on PR or merge (respectively) and trigger a
+deployment.
 
 ### Staging Workflow
 The staging workflow runs automatically upon the creation of a pull request to the main branch. The workflow will then
@@ -119,3 +121,25 @@ k6 run load-testing.js --insecure-skip-tls-verify
 ```
 
 Using this method I was able to successfully trigger a scale up of the environment as well as create an alarm.
+
+## Monitoring, SLIs, and SLOs
+This environment is deploying a web application and so the most important metrics I would consider in that realm are:
+1. Availabililty of the application
+2. Response time of the application
+3. Error rate of the application
+
+For these metrics, I would likely elect to use a synthetic monitoring tool through services like AWS, NewRelic, or
+DataDog. This way I can monitor valid endpoints, get uptime stats, see response times, and aggregate the data to be able
+to get a clear picture of how are performing in comparison to our defined SLOs.
+
+From an operational health perspective, this is all built on EC2 instances within a load-balanced and auto-scaled
+environment. With regard to the infrastructure, I'd be interested in monitoring statistics about the instances
+themselves. Some examples:
+
+1. CPU utilization
+2. Memory utilization
+3. Disk usage
+4. Logs
+
+These metrics and logs are easily obtainable from AWS directly via CloudWatch and CloudTrail and can be monitored
+directly or shipped and integrated with another third-party service in order provide observability about the system.
