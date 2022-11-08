@@ -8,6 +8,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   statistic                 = "Average"
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
+  alarm_actions             = [aws_sns_topic.flask_app_topic.arn]
+  ok_actions                = [aws_sns_topic.flask_app_topic.arn]
   insufficient_data_actions = []
 
   dimensions = {
