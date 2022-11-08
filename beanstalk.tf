@@ -32,7 +32,7 @@ resource "aws_elastic_beanstalk_environment" "flask_app_env" {
   setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
-    value     = join(",", [aws_default_subnet.default_az1.id, aws_default_subnet.default_az1.id])
+    value     = join(",", [aws_default_subnet.default_az1.id, aws_default_subnet.default_az2.id])
   }
 
   setting {
