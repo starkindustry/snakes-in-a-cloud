@@ -1,0 +1,49 @@
+name: Verify Terraform change and deploy to prod
+
+on:
+    push:
+        branches: [ main ]
+        paths:
+            - "**/*.tf"
+            - "**/*.tfvars"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v3
+        - uses: hashicorp/setup-terraform@v2
+
+        - name: Lint Terraform code
+          id: fmt
+          run: terraform fmt -check
+
+        - name: Select prod workspace
+          id: workspace
+          run: terraform workspace select production
+
+        - name: Validate Terraform
+          id: validate
+          run: terraform validate
+
+        - name: Terraform init
+          id: init
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform init
+
+        - name: Execute planning
+          id: plan
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform plan -var-file=production.tfvars
+
+        - name: Deploy infrastructure to production environment
+          id: apply
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform apply -auto-approve -var-file=production.tfvars
