@@ -7,5 +7,5 @@ resource "aws_route53_record" "www" {
   name    = "snakes-app.snakesinacloud-starkindustry.com"
   type    = "CNAME"
   ttl     = 300
-  records = [aws_elastic_beanstalk_environment.flask_app_env.load_balancers[0]]
+  records = [data.aws_alb.beanstalk_alb.dns_name]
 }

@@ -119,3 +119,7 @@ resource "aws_elastic_beanstalk_environment" "flask_app_env" {
     value     = 2
   }
 }
+
+data "aws_alb" "beanstalk_alb" {
+  arn = "${aws_elastic_beanstalk_environment.flask_app_env.load_balancers[0]}"
+}
