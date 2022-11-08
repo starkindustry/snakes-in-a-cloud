@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "snakes_in_a_cloud_zone" {
-  name = "snakesinacloud-starkindustry.com"
+  name = "snakesinacloud-${terraform.workspace}-starkindustry.com"
 }
 
 resource "aws_route53_record" "www" {
